@@ -39,3 +39,12 @@ file:
   upload:
     path: ./uploads/
     max-size: 10MB
+
+# ==================== argon2 ====================
+crypto:
+  argon2:
+    salt-length: 16      # 盐值长度（字节），默认 16
+    hash-length: 32      # 生成的哈希长度（字节），默认 32
+    parallelism: 2       # 线程数（并发度），根据服务器 CPU 核心数调整
+    memory: 65536        # 内存开销 (KB)，65536 KB = 64MB (推荐的 Web 安全水位)
+    iterations: 3        # 迭代次数 (时间开销)，默认 3
