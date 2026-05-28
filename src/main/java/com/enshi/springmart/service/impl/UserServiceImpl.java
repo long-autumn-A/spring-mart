@@ -1,12 +1,14 @@
 package com.enshi.springmart.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.enshi.springmart.common.security.JwtUtils;
 import com.enshi.springmart.dto.UserLoginDTO;
 import com.enshi.springmart.dto.UserRegisterDTO;
 import com.enshi.springmart.dto.UserUpdateDTO;
 import com.enshi.springmart.entity.User;
 import com.enshi.springmart.mapper.UserMapper;
 import com.enshi.springmart.service.UserService;
+import com.enshi.springmart.vo.LoginResultV0;
 import com.enshi.springmart.vo.UserV0;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +53,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
 
     @Override
-    public UserV0 login(UserLoginDTO loginDTO) {
+    public LoginResultV0 login(UserLoginDTO loginDTO) {
 //        根据用户名或手机号查询用户
         User user = this.lambdaQuery()
                 .eq(User::getUsername, loginDTO.getAccount())
@@ -69,7 +71,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
             throw new RuntimeException("用户不存在或密码错误");
         }
-        return convertToVO(user);
+//        密码正确，组装前端所需数据
+        UserV0 userV0 = new UserV0();
+//        JwtUtils 生成 Token 令牌
+        String token = JwtUtils.createToken(user.getId().toString(), user.getUsername());
+//        封装进统一的登录返回对象
+        LoginResultV0 result = new LoginResultV0();
+        result.setToken(token);
+        result.setUserInfo(userV0);
+        return result;
     }
 
     @Override

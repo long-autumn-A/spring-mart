@@ -5,6 +5,7 @@ import com.enshi.springmart.dto.UserLoginDTO;
 import com.enshi.springmart.dto.UserRegisterDTO;
 import com.enshi.springmart.dto.UserUpdateDTO;
 import com.enshi.springmart.service.UserService;
+import com.enshi.springmart.vo.LoginResultV0;
 import com.enshi.springmart.vo.UserV0;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +33,12 @@ public class UserController {
      * 用户登录接口
      */
     @PostMapping("/login")
-    public Result<UserV0> login(@Valid @RequestBody UserLoginDTO loginDTO) {
-        UserV0 userVO = userService.login(loginDTO);
-        return Result.success("登录成功", userVO);
+    public Result<LoginResultV0> login(@Valid @RequestBody UserLoginDTO loginDTO) {
+        // 调用业务层，业务层内部已完成 Argon2 密码比对并借助 JwtUtils 签发了 Token
+        LoginResultV0 loginResult = userService.login(loginDTO);
+
+        // 统一返回标准响应体
+        return Result.success("登录成功", loginResult);
     }
 
     /**

@@ -5,6 +5,7 @@ import com.enshi.springmart.dto.UserLoginDTO;
 import com.enshi.springmart.dto.UserRegisterDTO;
 import com.enshi.springmart.dto.UserUpdateDTO;
 import com.enshi.springmart.entity.User;
+import com.enshi.springmart.vo.LoginResultV0;
 import com.enshi.springmart.vo.UserV0;
 
 public interface UserService extends IService<User> {
@@ -16,7 +17,7 @@ public interface UserService extends IService<User> {
     /**
      * 用户登录
      */
-    UserV0 login(UserLoginDTO loginDTO);
+    LoginResultV0 login(UserLoginDTO loginDTO);
 
     /**
      * 更新用户信息
