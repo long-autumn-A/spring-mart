@@ -22,6 +22,7 @@ public enum ResultCode {
     PASSWORD_ERROR(1002, "密码错误"),
     ACCOUNT_DISABLED(1003, "账号已被禁用"),
     PHONE_EXIST(1004, "手机号已注册"),
+    USERNAME_EXIST(1005, "用户名已被占用"),
     STOCK_INSUFFICIENT(2001, "库存不足"),
     ORDER_NOT_FOUND(2002, "订单不存在"),
     ORDER_CANNOT_CANCEL(2003, "订单无法取消");
