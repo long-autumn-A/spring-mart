@@ -8,9 +8,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-/**
- * 用户注册请求 DTO
- */
+// 注册的时候前端传过来的数据
 @Data
 public class UserRegisterDTO implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -32,11 +30,9 @@ public class UserRegisterDTO implements Serializable {
     private String phone;
 
     @Email(message = "邮箱格式不正确")
-    private String email;
+    private String email; // 邮箱可以不填
 
-    /**
-     * 角色：注册时前端传过来，如果是前台商城默认是 0(普通用户)，如果是后台入驻可以传 1(商家)
-     */
+    // 注册时选的身份，0 买家 1 商家
     private Integer role;
 
 }

@@ -3,9 +3,7 @@ package com.enshi.springmart.common.result;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * 统一响应状态码
- */
+// 把常用的状态码和提示信息统一放在这里，免得到处写魔法数字
 @Getter
 @AllArgsConstructor
 public enum ResultCode {
@@ -17,12 +15,15 @@ public enum ResultCode {
     NOT_FOUND(404, "资源不存在"),
     INTERNAL_ERROR(500, "服务器内部错误"),
 
-    // 业务状态码
+    // 用户模块的业务错误码
     USER_NOT_FOUND(1001, "用户不存在"),
     PASSWORD_ERROR(1002, "密码错误"),
-    ACCOUNT_DISABLED(1003, "账号已被禁用"),
-    PHONE_EXIST(1004, "手机号已注册"),
-    USERNAME_EXIST(1005, "用户名已被占用"),
+    OLD_PASSWORD_ERROR(1003, "旧密码不正确"),
+    ACCOUNT_DISABLED(1004, "账号已被禁用"),
+    PHONE_EXIST(1005, "手机号已注册"),
+    USERNAME_EXIST(1006, "用户名已被占用"),
+
+    // 商品和订单相关的（先占个位）
     STOCK_INSUFFICIENT(2001, "库存不足"),
     ORDER_NOT_FOUND(2002, "订单不存在"),
     ORDER_CANNOT_CANCEL(2003, "订单无法取消");

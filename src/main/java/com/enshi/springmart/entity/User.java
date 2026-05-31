@@ -7,75 +7,49 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * 用户实体类
- * @author YourName
- * @since 2026-05-29
+ * 用户表，存所有用户的信息，买家和卖家都在这里面
  */
 @Data
 @TableName("user")
 public class User implements Serializable {
     private static final long serialVersionUID = 1L;
-    /**
-     * 用户ID
-     */
+
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 用户名
-     */
+    // 用户名，注册的时候自己起的
     private String username;
 
-    /**
-     * 密码（Argon2加密）
-     */
+    // 密码，存的是 Argon2 加密之后的密文
     private String password;
 
-    /**
-     * 昵称
-     */
+    // 昵称，展示给其他人看的
     private String nickname;
 
-    /**
-     * 手机号
-     */
+    // 手机号，也可以用来登录
     private String phone;
 
-    /**
-     * 邮箱
-     */
+    // 邮箱，可以不填
     private String email;
 
-    /**
-     * 头像URL
-     */
+    // 头像地址
     private String avatar;
 
-    /**
-     * 角色: 0=普通用户, 1=商家, 2=管理员
-     */
+    // 0 是买家、1 是商家、2 是管理员
     private Integer role;
 
-    /**
-     * 状态: 0=正常, 1=禁用
-     */
+    // 0 是正常、1 是被封禁了
     private Integer status;
 
-    /**
-     * 创建时间
-     */
+    // 注册时间
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 
-    /**
-     * 更新时间
-     */
+    // 最近一次修改信息的时间
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
 
-    /**
-     * 逻辑删除: 0=未删除, 1=已删除
-     */
+    // 逻辑删除，0 还在，1 已经删了
     @TableLogic
     private Integer deleted;
 }

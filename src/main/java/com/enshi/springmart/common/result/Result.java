@@ -2,15 +2,13 @@ package com.enshi.springmart.common.result;
 
 import lombok.Data;
 
-/**
- * 统一响应结果
- */
+// 统一返回格式，前端看到的所有接口响应都是这个结构
 @Data
 public class Result<T> {
 
-    private int code;
-    private String message;
-    private T data;
+    private int code;      // 状态码，200 表示成功
+    private String message; // 提示信息
+    private T data;         // 实际数据
 
     private Result(int code, String message, T data) {
         this.code = code;
@@ -18,7 +16,7 @@ public class Result<T> {
         this.data = data;
     }
 
-    // ========== 成功 ==========
+    // ---- 成功的几种情况 ----
 
     public static <T> Result<T> success() {
         return new Result<>(ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), null);
@@ -32,7 +30,7 @@ public class Result<T> {
         return new Result<>(ResultCode.SUCCESS.getCode(), message, data);
     }
 
-    // ========== 失败 ==========
+    // ---- 失败的几种情况 ----
 
     public static <T> Result<T> error() {
         return new Result<>(ResultCode.INTERNAL_ERROR.getCode(), ResultCode.INTERNAL_ERROR.getMessage(), null);

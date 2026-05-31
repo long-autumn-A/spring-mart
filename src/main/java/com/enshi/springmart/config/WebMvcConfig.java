@@ -6,18 +6,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+// 注册 JWT 拦截器，设置哪些路径要拦截、哪些不用
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private JwtInterceptor jwtInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(jwtInterceptor)
-                .addPathPatterns("/api/v1/**") // 拦截所有的业务接口
+                .addPathPatterns("/api/v1/**")       // 所有业务接口都要过拦截器
                 .excludePathPatterns(
-                        "/api/v1/user/login",    // 放行登录接口
-                        "/api/v1/user/register", // 放行注册接口
-                        "/api/v1/goods/**"       // 放行美食商品浏览接口（没登录也能看商品吧）
+                        "/api/v1/user/login",         // 登录不用鉴权
+                        "/api/v1/user/register",      // 注册不用鉴权
+                        "/api/v1/goods/**"            // 浏览商品不用登录
                 );
     }
 }

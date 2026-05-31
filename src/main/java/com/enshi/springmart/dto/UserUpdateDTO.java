@@ -6,16 +6,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import java.io.Serializable;
 
-/**
- * 用户信息修改 DTO
- */
+// 修改个人资料的时候前端传过来的
 @Data
 public class UserUpdateDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @NotBlank(message = "用户ID不能为空")
-    private String id; // 对应数据库BIGINT，前端传String防精度丢失
+    private String id; // 用 String 是因为 JS 的 number 存不下 Java 的 Long，会丢精度
 
     private String nickname;
 

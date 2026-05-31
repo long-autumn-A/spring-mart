@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-//Argon2
+// 配置密码加密方式，用 Argon2 替代 BCrypt，更安全
 @Configuration
 public class CryptoConfig {
 
@@ -19,5 +19,5 @@ public class CryptoConfig {
             @Value("${crypto.argon2.iterations}") int iterations) {
         return new Argon2PasswordEncoder(saltLength, hashLength, parallelism, memory, iterations);
     }
-}
 
+}

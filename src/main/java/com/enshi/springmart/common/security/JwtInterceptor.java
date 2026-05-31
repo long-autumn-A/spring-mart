@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+// 拦截器，每个请求进来先检查有没有带合法的 token
 @Component
 public class JwtInterceptor implements HandlerInterceptor {
 
@@ -15,27 +16,25 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // 从 HTTP 请求头中获取 Authorization
         String authHeader = request.getHeader("Authorization");
 
-        // 如果前端没传 Token，抛出未登录异常
+        // 没带 token，直接挡回去
         if (authHeader == null || authHeader.isEmpty()) {
             throw new BusinessException(ResultCode.UNAUTHORIZED.getCode(), "未登录或Token缺失，请先登录");
         }
 
-        // 兼容 "Bearer xxx" 和纯 token 两种格式
+        // 前端可能会带 "Bearer xxx" 格式，也可能只传 token 本身，都兼容一下
         String token = authHeader;
         if (authHeader.startsWith(BEARER_PREFIX)) {
             token = authHeader.substring(BEARER_PREFIX.length());
         }
 
         try {
-            // 解析 Token，如果过期或被篡改，这里会直接抛出异常
+            // 解析 token，不合法或过期了都会在这步炸
             Claims claims = JwtUtils.parseToken(token);
-
-            // 将解析出来的 userId 存入 request 域中，方便后续 Controller 直接获取
+            // 把 userId 存到 request 里，后面 Controller 可以直接拿
             request.setAttribute("currentUserId", claims.getSubject());
-            return true; // 放行
+            return true;
         } catch (Exception e) {
             throw new BusinessException(ResultCode.UNAUTHORIZED.getCode(), "Token已过期或不合法，请重新登录");
         }
