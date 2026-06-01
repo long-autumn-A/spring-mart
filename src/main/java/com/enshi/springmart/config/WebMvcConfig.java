@@ -21,7 +21,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/v1/user/register",      // 注册不用鉴权
                         "/api/v1/categories/list",    // 查看分类树不用登录
                         "/api/v1/categories/flat",    // 扁平分类列表也不用登录
-                        "/api/v1/goods/**"            // 浏览商品不用登录
+                        "/api/v1/goods/list",         // 商品列表公开
+                        "/api/v1/goods/detail/**",    // 商品详情公开
+                        "/api/v1/goods/*/images",     // 商品轮播图公开
+                        "/api/v1/shop/list",          // 店铺列表不用登录
+                        "/api/v1/shop/detail/**"      // 店铺详情不用登录
                 );
     }
 }

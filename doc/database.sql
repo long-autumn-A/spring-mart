@@ -312,3 +312,13 @@ INSERT INTO `product` (`id`, `name`, `category_id`, `description`, `price`, `sal
 (703, '建始猕猴桃·绿心',     7, '富硒土壤培育，维C爆表',                   28.00,  3200, '', '时令', 1, 1, 3),
 (704, '恩施黑猪肉·生鲜',     7, '散养黑猪，肉质紧实鲜嫩',                  58.00,   950, '', '',     1, 0, 4);
 
+-- =====================================================
+-- 种子数据：店铺（需先注册商家用户后替换 user_id）
+-- =====================================================
+-- 注册示例：POST /api/v1/user/register  {"username":"zhangsan","password":"123456","nickname":"张三土家腊味铺","phone":"13800000001","role":1}
+-- 注册示例：POST /api/v1/user/register  {"username":"lisi","password":"123456","nickname":"李四高山茶庄","phone":"13800000002","role":1}
+-- 然后用返回的 userId 替换下面 INSERT 中的 user_id
+-- INSERT INTO `shop` (`user_id`, `name`, `description`, `phone`, `status`) VALUES
+-- (2, '张三土家腊味铺', '三代传承的土家腊味老店，纯手工熏制，地道恩施味', '13800000001', 1),
+-- (3, '李四高山茶庄', '自家恩施高山茶园，富硒认证，从枝头到杯中的新鲜', '13800000002', 1);
+
