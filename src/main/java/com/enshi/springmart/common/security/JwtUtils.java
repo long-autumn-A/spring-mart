@@ -18,12 +18,13 @@ public class JwtUtils {
     // 7 天过期
     private static final long EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L;
 
-    // 根据用户 ID 和用户名生成一个 token
-    public static String createToken(String userId, String username) {
+    // 根据用户 ID、用户名和角色生成 token
+    public static String createToken(String userId, String username, String role) {
         SecretKey key = Keys.hmacShaKeyFor(SIGN_KEY.getBytes(StandardCharsets.UTF_8));
         return Jwts.builder()
                 .subject(userId)
                 .claim("username", username)
+                .claim("role", role)
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRE_TIME))
                 .signWith(key)

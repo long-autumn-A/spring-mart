@@ -89,7 +89,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         // 密码对了，生成 token 和返回信息
         UserV0 userV0 = convertToVO(user);
-        String token = JwtUtils.createToken(user.getId().toString(), user.getUsername());
+        String token = JwtUtils.createToken(user.getId().toString(), user.getUsername(), user.getRole().toString());
         LoginResultV0 result = new LoginResultV0();
         result.setToken(token);
         result.setUserInfo(userV0);

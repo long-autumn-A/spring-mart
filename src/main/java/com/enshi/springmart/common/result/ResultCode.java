@@ -23,6 +23,12 @@ public enum ResultCode {
     PHONE_EXIST(1005, "手机号已注册"),
     USERNAME_EXIST(1006, "用户名已被占用"),
 
+    // 分类模块
+    CATEGORY_NOT_FOUND(3001, "分类不存在"),
+    CATEGORY_HAS_CHILDREN(3002, "该分类下还有子分类，无法删除"),
+    CATEGORY_PARENT_NOT_FOUND(3003, "父分类不存在"),
+    CATEGORY_PARENT_SELF(3004, "不能将自己设为父分类"),
+
     // 商品和订单相关的（先占个位）
     STOCK_INSUFFICIENT(2001, "库存不足"),
     ORDER_NOT_FOUND(2002, "订单不存在"),

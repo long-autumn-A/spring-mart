@@ -19,6 +19,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/api/v1/user/login",         // 登录不用鉴权
                         "/api/v1/user/register",      // 注册不用鉴权
+                        "/api/v1/categories/list",    // 查看分类树不用登录
+                        "/api/v1/categories/flat",    // 扁平分类列表也不用登录
                         "/api/v1/goods/**"            // 浏览商品不用登录
                 );
     }

@@ -37,6 +37,7 @@ CREATE TABLE `category` (
     `parent_id`     BIGINT      NOT NULL DEFAULT 0       COMMENT '父分类ID，0=顶级分类',
     `sort_order`    INT         NOT NULL DEFAULT 0       COMMENT '排序值（越小越靠前）',
     `icon`          VARCHAR(255) DEFAULT NULL            COMMENT '分类图标URL',
+    `description`   VARCHAR(255) DEFAULT NULL            COMMENT '分类描述',
     `created_at`    DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at`    DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted`       TINYINT     NOT NULL DEFAULT 0       COMMENT '逻辑删除',
@@ -44,7 +45,7 @@ CREATE TABLE `category` (
     KEY `idx_parent_id` (`parent_id`),
     KEY `idx_sort_order` (`sort_order`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品分类表';
-
+ ALTER TABLE `category` ADD COLUMN `description` VARCHAR(255) DEFAULT NULL COMMENT '分类描述' AFTER `icon`;
 
 -- ==================== 3. 店铺表 ====================
 DROP TABLE IF EXISTS `shop`;
@@ -83,8 +84,10 @@ CREATE TABLE `product` (
     `stock`          INT            NOT NULL DEFAULT 0       COMMENT '库存',
     `sales`          INT            NOT NULL DEFAULT 0       COMMENT '累计销量',
     `main_image`     VARCHAR(255)   DEFAULT NULL             COMMENT '商品主图URL',
+    `badge`          VARCHAR(20)    DEFAULT NULL             COMMENT '角标（热卖/新品/爆款等）',
     `status`         TINYINT        NOT NULL DEFAULT 0       COMMENT '状态: 0=下架, 1=上架',
     `is_recommended` TINYINT        NOT NULL DEFAULT 0       COMMENT '是否推荐: 0=否, 1=是',
+    `sort_order`     INT            NOT NULL DEFAULT 0       COMMENT '排序值（越小越靠前）',
     `created_at`     DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at`     DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted`        TINYINT        NOT NULL DEFAULT 0       COMMENT '逻辑删除',
@@ -97,6 +100,10 @@ CREATE TABLE `product` (
     CONSTRAINT `fk_product_category` FOREIGN KEY (`category_id`) REFERENCES `category`(`id`),
     CONSTRAINT `fk_product_shop` FOREIGN KEY (`shop_id`) REFERENCES `shop`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表';
+
+  ALTER TABLE `product`
+     ADD COLUMN `badge`     VARCHAR(20) DEFAULT NULL COMMENT '角标（热卖/新品/爆款等）' AFTER `main_image`,
+     ADD COLUMN `sort_order` INT         NOT NULL DEFAULT 0   COMMENT '排序值（越小越靠前）' AFTER `is_recommended`;
 
 
 -- ==================== 4. 商品图片表 ====================
@@ -251,3 +258,57 @@ CREATE TABLE `banner` (
     PRIMARY KEY (`id`),
     KEY `idx_status_sort` (`status`, `sort_order`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='轮播图表';
+
+
+-- =====================================================
+-- 种子数据：分类
+-- =====================================================
+INSERT INTO `category` (`id`, `name`, `parent_id`, `sort_order`, `icon`, `description`) VALUES
+(1,  '富硒茗茶', 0, 1, '🍵', '来自恩施高山富硒茶园的天然好茶，传统蒸青工艺，回味甘醇'),
+(2,  '土家腊味', 0, 2, '🥩', '土家族百年传承的熏制工艺，松柏枝慢火熏烤，腊香浓郁'),
+(3,  '山珍干货', 0, 3, '🍄', '采自武陵山区深处的野生菌菇与珍稀食材，自然晾晒锁鲜'),
+(4,  '特色小吃', 0, 4, '🫘', '恩施街头巷尾的地道风味，土家酱香饼、柏杨豆干等经典零嘴'),
+(5,  '高山杂粮', 0, 5, '🌽', '恩施富硒土壤孕育的土豆、大米、豆皮，硒含量世界罕见'),
+(6,  '山野调味', 0, 6, '🌶️', '土家厨房的秘密武器，鲊广椒、油茶汤、酸萝卜，一勺入魂'),
+(7,  '农家蜜果', 0, 7, '🍯', '深山蜂农自产土蜂蜜，高山果园直供猕猴桃、关口葡萄');
+
+-- =====================================================
+-- 种子数据：商品
+-- =====================================================
+INSERT INTO `product` (`id`, `name`, `category_id`, `description`, `price`, `sales`, `main_image`, `badge`, `status`, `is_recommended`, `sort_order`) VALUES
+(101, '恩施玉露·特级',       1, '蒸青绿茶，一芽一叶，富硒认证',            168.00, 2380, '', '热卖', 1, 1, 1),
+(102, '利川红茶·工夫红',     1, '利川高山红茶，蜜香醇厚',                  128.00, 1520, '', '',     1, 1, 2),
+(103, '来凤藤茶·野生',       1, '武陵山区野生藤茶，回甘绵长',               89.00,  980,  '', '新品', 1, 1, 3),
+(104, '宣恩贡茶·明前',       1, '明清贡品，栗香馥郁',                      198.00,  650, '', '',     1, 1, 4),
+(105, '花枝茶·高山云雾',     1, '云雾滋养，花香清雅',                       78.00, 1120, '', '',     1, 0, 5),
+(201, '土家腊肉·五花',       2, '松柏慢熏45天，肥瘦相间',                  68.00,  3200, '', '爆款', 1, 1, 1),
+(202, '土家腊蹄子',           2, '整只猪蹄熏制，胶原满满',                  88.00,  1890, '', '',     1, 1, 2),
+(203, '宣恩火腿·精腿',       2, '宣恩传统工艺，三年陈腿',                  268.00,  420, '', '',     1, 1, 3),
+(204, '土家腊排骨',           2, '精选肋排，骨香肉嫩',                      58.00,  2100, '', '热卖', 1, 1, 4),
+(205, '年肉·土家风味',       2, '年节必备，肥而不腻',                      45.00,  1760, '', '',     1, 0, 5),
+(301, '葛仙米·野生',         3, '纯野生水藻，晶莹剔透',                    158.00,  760, '', '珍品', 1, 1, 1),
+(302, '福宝山莼菜',           3, '高山冷水莼菜，嫩滑爽口',                  38.00,  1450, '', '',     1, 1, 2),
+(303, '凤头姜·新鲜',         3, '形似凤头，脆嫩香辣',                      25.00,  2800, '', '热卖', 1, 1, 3),
+(304, '景阳核桃·薄壳',       3, '皮薄仁满，自然原香',                      42.00,  1680, '', '',     1, 0, 4),
+(305, '板桥党参·特级',       3, '中国板党之乡，补气佳品',                  198.00,  530, '', '',     1, 1, 5),
+(401, '柏杨豆干·经典',       4, '土家一绝，薄如纸片，嚼劲十足',            22.00,  5600, '', '爆款', 1, 1, 1),
+(402, '巴东五香豆干',         4, '五香卤制，回味无穷',                      18.00,  4100, '', '',     1, 1, 2),
+(403, '土家酱香饼·即食',     4, '中国披萨，酱香浓郁',                      28.00,  3800, '', '热卖', 1, 1, 3),
+(404, '恩施土家糍粑',         4, '糯米手工捶打，软糯香甜',                  35.00,  2200, '', '',     1, 1, 4),
+(405, '花坪桃片糕',           4, '传统手工糕点，细腻绵软',                  16.00,  3400, '', '',     1, 0, 5),
+(406, '土家烧饼·五香',       4, '炭火烤制，外酥里嫩',                      15.00,  5000, '', '',     1, 1, 6),
+(501, '恩施富硒土豆·5斤',    5, '世界硒都，软糯香甜，含硒认证',            29.00,  8900, '', '爆款', 1, 1, 1),
+(502, '景阳大米·富硒',       5, '中国最贵大米之一，形似玉色',              128.00,  320, '', '珍品', 1, 1, 2),
+(503, '恩施豆皮·米豆皮',     5, '纯米浆制，软糯有嚼劲',                    12.00,  6300, '', '',     1, 1, 3),
+(504, '野三关苞谷酒',         5, '玉米纯酿，土家茅台',                      58.00,  1900, '', '',     1, 0, 4),
+(505, '社饭料包·传统',       5, '野葱腊肉糯米，一包搞定',                  20.00,  2500, '', '',     1, 1, 5),
+(601, '鲊广椒·土家风味',     6, '鲜红辣椒配苞谷面，酸辣开胃',              18.00,  4200, '', '热卖', 1, 1, 1),
+(602, '恩施酸萝卜',           6, '老坛泡制，酸甜脆爽',                      15.00,  3500, '', '',     1, 1, 2),
+(603, '建南咸菜·老坛',       6, '传统工艺腌制，佐饭神器',                  12.00,  2800, '', '',     1, 0, 3),
+(604, '土家油茶汤料',         6, '武陵山区传统茶汤，一冲即饮',              32.00,  1600, '', '',     1, 1, 4),
+(605, '恩施水豆豉',           6, '黄豆发酵，鲜香微辣',                      10.00,  4100, '', '',     1, 1, 5),
+(701, '尚风寨土蜂蜜·纯',     7, '深山蜂农自采，零添加纯天然',              98.00,  1800, '', '',     1, 1, 1),
+(702, '关口葡萄·新鲜',       7, '高山葡萄，甜度高汁水足',                  36.00,  2100, '', '时令', 1, 1, 2),
+(703, '建始猕猴桃·绿心',     7, '富硒土壤培育，维C爆表',                   28.00,  3200, '', '时令', 1, 1, 3),
+(704, '恩施黑猪肉·生鲜',     7, '散养黑猪，肉质紧实鲜嫩',                  58.00,   950, '', '',     1, 0, 4);
+

@@ -32,8 +32,9 @@ public class JwtInterceptor implements HandlerInterceptor {
         try {
             // 解析 token，不合法或过期了都会在这步炸
             Claims claims = JwtUtils.parseToken(token);
-            // 把 userId 存到 request 里，后面 Controller 可以直接拿
+            // 把 userId 和 role 存到 request 里，后面 Controller 和权限判断都可以直接拿
             request.setAttribute("currentUserId", claims.getSubject());
+            request.setAttribute("currentUserRole", claims.get("role", String.class));
             return true;
         } catch (Exception e) {
             throw new BusinessException(ResultCode.UNAUTHORIZED.getCode(), "Token已过期或不合法，请重新登录");
