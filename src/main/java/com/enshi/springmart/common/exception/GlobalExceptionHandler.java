@@ -5,6 +5,7 @@ import com.enshi.springmart.common.result.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -22,12 +23,21 @@ public class GlobalExceptionHandler {
         return Result.error(e.getCode(), e.getMessage());
     }
 
-    // 前端传来的参数没通过 @Valid 校验
+    // 前端传来的参数没通过 @Valid 校验（@ModelAttribute 或普通表单）
     @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(BindException.class)
     public Result<?> handleBindException(BindException e) {
         String message = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
-        log.warn("参数校验失败: {}", message);
+        log.warn("参数校验失败(Bind): {}", message);
+        return Result.error(ResultCode.BAD_REQUEST.getCode(), message);
+    }
+
+    // @Valid 校验 @RequestBody 时抛出的异常（Spring MVC 用这个而不是 BindException）
+    @ResponseStatus(HttpStatus.OK)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Result<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        String message = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        log.warn("参数校验失败(Body): {}", message);
         return Result.error(ResultCode.BAD_REQUEST.getCode(), message);
     }
 

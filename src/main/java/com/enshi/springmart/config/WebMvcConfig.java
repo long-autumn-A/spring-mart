@@ -4,6 +4,7 @@ import com.enshi.springmart.common.security.JwtInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 // 注册 JWT 拦截器，设置哪些路径要拦截、哪些不用
@@ -11,6 +12,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private JwtInterceptor jwtInterceptor;
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 映射 /uploads/** 到本地 ./uploads/ 目录，让上传的图片可以直接通过 URL 访问
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:./uploads/");
+    }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {

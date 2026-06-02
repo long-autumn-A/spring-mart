@@ -12,13 +12,14 @@ public interface ProductService extends IService<Product> {
 
     /**
      * 按分类和关键词分页查询商品列表
-     * @param categoryId 分类ID，传null或0表示全部
-     * @param keyword    搜索关键词（模糊匹配商品名），传null或空表示不筛选
-     * @param page       页码，从1开始
-     * @param pageSize   每页条数
+     * @param categoryId     分类ID，传null或0表示全部
+     * @param keyword        搜索关键词（模糊匹配商品名），传null或空表示不筛选
+     * @param page           页码，从1开始
+     * @param pageSize       每页条数
+     * @param includeOffline 是否包含下架商品（商家后台管理用）
      * @return 分页商品VO
      */
-    PageResult<ProductVO> listByCategory(Long categoryId, String keyword, int page, int pageSize);
+    PageResult<ProductVO> listByCategory(Long categoryId, String keyword, int page, int pageSize, boolean includeOffline);
 
     /**
      * 查询商品详情（含店铺名）

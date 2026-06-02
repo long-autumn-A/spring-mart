@@ -41,10 +41,12 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     // ==================== 查询 ====================
 
     @Override
-    public PageResult<ProductVO> listByCategory(Long categoryId, String keyword, int page, int pageSize) {
+    public PageResult<ProductVO> listByCategory(Long categoryId, String keyword, int page, int pageSize, boolean includeOffline) {
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
-        // 只查上架商品
-        wrapper.eq(Product::getStatus, 1);
+        // 默认只查上架商品，商家管理后台可以查全部
+        if (!includeOffline) {
+            wrapper.eq(Product::getStatus, 1);
+        }
         // categoryId 为 null 或 0 → 查全部
         if (categoryId != null && categoryId > 0) {
             wrapper.eq(Product::getCategoryId, categoryId);
@@ -102,6 +104,8 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean saveProduct(ProductSaveDTO dto) {
+        log.info("saveProduct 开始执行: name={}, shopId={}, categoryId={}, price={}", 
+                dto.getName(), dto.getShopId(), dto.getCategoryId(), dto.getPrice());
         // 校验分类是否存在
         Category category = categoryMapper.selectById(dto.getCategoryId());
         if (category == null) {

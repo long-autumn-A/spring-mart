@@ -11,9 +11,13 @@ import com.enshi.springmart.service.ProductService;
 import com.enshi.springmart.vo.ProductVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/goods")
 public class ProductController {
@@ -28,17 +32,19 @@ public class ProductController {
 
     /**
      * 按分类 + 关键词分页获取商品列表（支持组合查询）
-     * @param categoryId 分类ID，0或不传表示全部
-     * @param keyword    搜索关键词（模糊匹配商品名），不传则查全部
-     * @param page       页码，默认第1页
-     * @param pageSize   每页条数，默认10条
+     * @param categoryId     分类ID，0或不传表示全部
+     * @param keyword        搜索关键词（模糊匹配商品名），不传则查全部
+     * @param page           页码，默认第1页
+     * @param pageSize       每页条数，默认10条
+     * @param includeOffline 是否包含下架商品，默认false（仅上架）
      */
     @GetMapping("/list")
     public Result<PageResult<ProductVO>> list(@RequestParam(required = false, defaultValue = "0") Long categoryId,
                                                @RequestParam(required = false) String keyword,
                                                @RequestParam(required = false, defaultValue = "1") int page,
-                                               @RequestParam(required = false, defaultValue = "10") int pageSize) {
-        PageResult<ProductVO> pageResult = productService.listByCategory(categoryId, keyword, page, pageSize);
+                                               @RequestParam(required = false, defaultValue = "10") int pageSize,
+                                               @RequestParam(required = false, defaultValue = "false") boolean includeOffline) {
+        PageResult<ProductVO> pageResult = productService.listByCategory(categoryId, keyword, page, pageSize, includeOffline);
         return Result.success(pageResult);
     }
 
@@ -58,6 +64,7 @@ public class ProductController {
      */
     @PostMapping
     public Result<?> addProduct(@Valid @RequestBody ProductSaveDTO dto, HttpServletRequest request) {
+        log.info("收到新增商品请求: name={}, shopId={}, categoryId={}", dto.getName(), dto.getShopId(), dto.getCategoryId());
         checkAdminOrMerchant(request);
         productService.saveProduct(dto);
         return Result.success("商品新增成功", null);
