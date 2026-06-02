@@ -2,13 +2,14 @@ package com.enshi.springmart.common.security;
 
 import com.enshi.springmart.common.exception.BusinessException;
 import com.enshi.springmart.common.result.ResultCode;
+import com.enshi.springmart.utils.UserContext;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-// 拦截器，每个请求进来先检查有没有带合法的 token
+// 拦截器，每个请求进来先检查有没有带合法的 token，解析后存入 UserContext
 @Component
 public class JwtInterceptor implements HandlerInterceptor {
 
@@ -32,12 +33,25 @@ public class JwtInterceptor implements HandlerInterceptor {
         try {
             // 解析 token，不合法或过期了都会在这步炸
             Claims claims = JwtUtils.parseToken(token);
-            // 把 userId 和 role 存到 request 里，后面 Controller 和权限判断都可以直接拿
+            Long userId = Long.valueOf(claims.getSubject());
+            Integer role = Integer.valueOf(claims.get("role", String.class));
+
+            // 存入 request（保留兼容，后续可以逐步移除）
             request.setAttribute("currentUserId", claims.getSubject());
             request.setAttribute("currentUserRole", claims.get("role", String.class));
+
+            // 存入 ThreadLocal，后续 Controller/Service 任意地方都能取
+            UserContext.set(userId, role);
             return true;
         } catch (Exception e) {
             throw new BusinessException(ResultCode.UNAUTHORIZED.getCode(), "Token已过期或不合法，请重新登录");
         }
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
+                                Object handler, Exception ex) {
+        // 请求结束，清理 ThreadLocal，防止内存泄漏
+        UserContext.clear();
     }
 }

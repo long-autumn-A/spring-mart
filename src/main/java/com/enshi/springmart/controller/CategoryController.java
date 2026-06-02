@@ -6,8 +6,8 @@ import com.enshi.springmart.common.result.ResultCode;
 import com.enshi.springmart.dto.CategorySaveDTO;
 import com.enshi.springmart.dto.CategoryUpdateDTO;
 import com.enshi.springmart.service.CategoryService;
+import com.enshi.springmart.utils.UserContext;
 import com.enshi.springmart.vo.CategoryTreeVO;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,12 +36,12 @@ public class CategoryController {
         return Result.success(flatList);
     }
 
-    // ==================== 管理员和商家接口 ====================
+    // ==================== 管理员接口 ====================
 
     // 新增分类
     @PostMapping("/add")
-    public Result<?> addCategory(@Valid @RequestBody CategorySaveDTO saveDTO, HttpServletRequest request) {
-        checkAdmin(request);
+    public Result<?> addCategory(@Valid @RequestBody CategorySaveDTO saveDTO) {
+        checkAdmin();
         categoryService.saveCategory(saveDTO);
         return Result.success("分类新增成功", null);
     }
@@ -49,9 +49,8 @@ public class CategoryController {
     // 修改分类
     @PutMapping("/update/{id}")
     public Result<?> updateCategory(@PathVariable Long id,
-                                     @Valid @RequestBody CategoryUpdateDTO updateDTO,
-                                     HttpServletRequest request) {
-        checkAdmin(request);
+                                     @Valid @RequestBody CategoryUpdateDTO updateDTO) {
+        checkAdmin();
         updateDTO.setId(id);
         categoryService.updateCategory(updateDTO);
         return Result.success("分类修改成功", null);
@@ -59,17 +58,17 @@ public class CategoryController {
 
     // 删除分类
     @DeleteMapping("/delete/{id}")
-    public Result<?> deleteCategory(@PathVariable Long id, HttpServletRequest request) {
-        checkAdmin(request);
+    public Result<?> deleteCategory(@PathVariable Long id) {
+        checkAdmin();
         categoryService.deleteCategory(id);
         return Result.success("分类删除成功", null);
     }
 
     // ==================== 权限校验 ====================
 
-    private void checkAdmin(HttpServletRequest request) {
-        Object roleObj = request.getAttribute("currentUserRole");
-        if (roleObj == null || !"2".equals(roleObj.toString())) {
+    private void checkAdmin() {
+        Integer role = UserContext.getRole();
+        if (role == null || role != 2) {
             throw new BusinessException(ResultCode.FORBIDDEN);
         }
     }

@@ -8,8 +8,8 @@ import com.enshi.springmart.dto.ProductSaveDTO;
 import com.enshi.springmart.entity.ProductImage;
 import com.enshi.springmart.service.ProductImageService;
 import com.enshi.springmart.service.ProductService;
+import com.enshi.springmart.utils.UserContext;
 import com.enshi.springmart.vo.ProductVO;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +32,6 @@ public class ProductController {
 
     /**
      * 按分类 + 关键词分页获取商品列表（支持组合查询）
-     * @param categoryId     分类ID，0或不传表示全部
-     * @param keyword        搜索关键词（模糊匹配商品名），不传则查全部
-     * @param page           页码，默认第1页
-     * @param pageSize       每页条数，默认10条
-     * @param includeOffline 是否包含下架商品，默认false（仅上架）
      */
     @GetMapping("/list")
     public Result<PageResult<ProductVO>> list(@RequestParam(required = false, defaultValue = "0") Long categoryId,
@@ -63,9 +58,9 @@ public class ProductController {
      * 新增商品
      */
     @PostMapping
-    public Result<?> addProduct(@Valid @RequestBody ProductSaveDTO dto, HttpServletRequest request) {
+    public Result<?> addProduct(@Valid @RequestBody ProductSaveDTO dto) {
         log.info("收到新增商品请求: name={}, shopId={}, categoryId={}", dto.getName(), dto.getShopId(), dto.getCategoryId());
-        checkAdminOrMerchant(request);
+        checkAdminOrMerchant();
         productService.saveProduct(dto);
         return Result.success("商品新增成功", null);
     }
@@ -74,10 +69,8 @@ public class ProductController {
      * 修改商品
      */
     @PutMapping("/{id}")
-    public Result<?> updateProduct(@PathVariable Long id,
-                                   @Valid @RequestBody ProductSaveDTO dto,
-                                   HttpServletRequest request) {
-        checkAdminOrMerchant(request);
+    public Result<?> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductSaveDTO dto) {
+        checkAdminOrMerchant();
         dto.setId(id);
         productService.updateProduct(dto);
         return Result.success("商品修改成功", null);
@@ -87,8 +80,8 @@ public class ProductController {
      * 删除商品（逻辑删除）
      */
     @DeleteMapping("/{id}")
-    public Result<?> deleteProduct(@PathVariable Long id, HttpServletRequest request) {
-        checkAdminOrMerchant(request);
+    public Result<?> deleteProduct(@PathVariable Long id) {
+        checkAdminOrMerchant();
         productService.deleteProduct(id);
         return Result.success("商品删除成功", null);
     }
@@ -97,10 +90,8 @@ public class ProductController {
      * 变更商品状态（上架/下架）
      */
     @PutMapping("/{id}/status")
-    public Result<?> updateStatus(@PathVariable Long id,
-                                  @RequestParam Integer status,
-                                  HttpServletRequest request) {
-        checkAdminOrMerchant(request);
+    public Result<?> updateStatus(@PathVariable Long id, @RequestParam Integer status) {
+        checkAdminOrMerchant();
         productService.updateStatus(id, status);
         return Result.success("商品状态变更成功", null);
     }
@@ -122,9 +113,8 @@ public class ProductController {
     @PostMapping("/{productId}/images")
     public Result<?> addImage(@PathVariable Long productId,
                               @RequestParam String imageUrl,
-                              @RequestParam(required = false, defaultValue = "0") Integer sortOrder,
-                              HttpServletRequest request) {
-        checkAdminOrMerchant(request);
+                              @RequestParam(required = false, defaultValue = "0") Integer sortOrder) {
+        checkAdminOrMerchant();
         productImageService.addImage(productId, imageUrl, sortOrder);
         return Result.success("图片添加成功", null);
     }
@@ -133,8 +123,8 @@ public class ProductController {
      * 删除单张轮播图
      */
     @DeleteMapping("/images/{imageId}")
-    public Result<?> deleteImage(@PathVariable Long imageId, HttpServletRequest request) {
-        checkAdminOrMerchant(request);
+    public Result<?> deleteImage(@PathVariable Long imageId) {
+        checkAdminOrMerchant();
         productImageService.removeById(imageId);
         return Result.success("图片删除成功", null);
     }
@@ -144,14 +134,9 @@ public class ProductController {
     /**
      * 校验管理员或商家身份（管理员 role=2 或商家 role=1）
      */
-    private void checkAdminOrMerchant(HttpServletRequest request) {
-        Object roleObj = request.getAttribute("currentUserRole");
-        if (roleObj == null) {
-            throw new BusinessException(ResultCode.UNAUTHORIZED);
-        }
-        String role = roleObj.toString();
-        // 管理员(2) 或 商家(1) 都可以操作商品
-        if (!"1".equals(role) && !"2".equals(role)) {
+    private void checkAdminOrMerchant() {
+        Integer role = UserContext.getRole();
+        if (role == null || (role != 1 && role != 2)) {
             throw new BusinessException(ResultCode.FORBIDDEN);
         }
     }
@@ -159,9 +144,9 @@ public class ProductController {
     /**
      * 严格校验管理员身份（role=2），用于敏感操作
      */
-    private void checkAdmin(HttpServletRequest request) {
-        Object roleObj = request.getAttribute("currentUserRole");
-        if (roleObj == null || !"2".equals(roleObj.toString())) {
+    private void checkAdmin() {
+        Integer role = UserContext.getRole();
+        if (role == null || role != 2) {
             throw new BusinessException(ResultCode.FORBIDDEN);
         }
     }
