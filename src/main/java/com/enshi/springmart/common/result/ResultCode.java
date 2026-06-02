@@ -23,10 +23,9 @@ public enum ResultCode {
     PHONE_EXIST(1005, "手机号已注册"),
     USERNAME_EXIST(1006, "用户名已被占用"),
 
-    // 店铺模块
-    SHOP_NOT_FOUND(4001, "店铺不存在"),
-    SHOP_ALREADY_EXISTS(4002, "您已经创建过店铺了"),
-    SHOP_NAME_EXISTS(4003, "店铺名称已被占用"),
+    // 商品模块
+    PRODUCT_NOT_FOUND(2001, "商品不存在"),
+    STOCK_INSUFFICIENT(2002, "库存不足"),
 
     // 分类模块
     CATEGORY_NOT_FOUND(3001, "分类不存在"),
@@ -34,14 +33,25 @@ public enum ResultCode {
     CATEGORY_PARENT_NOT_FOUND(3003, "父分类不存在"),
     CATEGORY_PARENT_SELF(3004, "不能将自己设为父分类"),
 
-    // 商品模块
-    PRODUCT_NOT_FOUND(2001, "商品不存在"),
-    STOCK_INSUFFICIENT(2002, "库存不足"),
-
     // 订单模块
-    ORDER_NOT_FOUND(3001, "订单不存在"),
-    ORDER_CANNOT_CANCEL(3002, "订单无法取消");
+    ORDER_NOT_FOUND(3001, "订单不存在"), // 注意：你原代码中分类和订单都用了3001、3002，建议后续将订单改为3500+或别的，暂时保持原样
+    ORDER_CANNOT_CANCEL(3002, "订单无法取消"),
+
+    // 店铺模块
+    SHOP_NOT_FOUND(4001, "店铺不存在"),
+    SHOP_ALREADY_EXISTS(4002, "您已经创建过店铺了"),
+    SHOP_NAME_EXISTS(4003, "店铺名称已被占用"),
+
+    // 购物车模块
+    CART_ITEM_NOT_FOUND(5001, "购物车记录不存在或无权操作"),
+    CART_PRODUCT_SKU_NOT_FOUND(5002, "添加的商品不存在"),
+    CART_PRODUCT_OFF_SHELF(5003, "商品已下架，无法加入购物车"),
+    CART_STOCK_INSUFFICIENT(5004, "加入购物车失败，购买总数已超过商品当前库存"),
+    CART_QUANTITY_INVALID(5005, "商品数量必须大于0"),
+    CART_EMPTY_CHECKOUT(5006, "未选中任何商品，无法结算"),
+    CART_ITEM_LIMIT_EXCEEDED(5007, "购物车商品种类已达上限，请先清理"),
+    CART_UPDATE_STOCK_INSUFFICIENT(5008, "修改数量失败，商品库存不足");
 
     private final int code;
     private final String message;
-}
+    }
