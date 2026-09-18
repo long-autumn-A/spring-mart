@@ -35,4 +35,9 @@ public class UserRegisterDTO implements Serializable {
     // 注册时选的身份，0 买家 1 商家
     private Integer role;
 
+    @NotBlank(message = "验证码不能为空")
+    private String code;   // 用户输入的验证码
+
+    @NotBlank(message = "验证码标识不能为空")
+    private String uuid;   // 获取验证码时返回的 uuid
 }

@@ -33,6 +33,5 @@ public class AddressUpdateDTO implements Serializable {
     @NotBlank(message = "详细地址不能为空")
     private String detail;
 
-    @NotNull(message = "是否默认状态不能为空")
-    private Integer isDefault;
+    private Integer isDefault; // 可选，不传则保持原值
 }

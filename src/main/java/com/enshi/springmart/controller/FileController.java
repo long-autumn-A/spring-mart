@@ -105,7 +105,7 @@ public class FileController {
         String dateDir = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
         String newFilename = UUID.randomUUID().toString() + "." + extension.toLowerCase();
 
-        Path dir = Paths.get(uploadPath, dateDir);
+        Path dir = Paths.get(uploadPath).toAbsolutePath().resolve(dateDir);
         Files.createDirectories(dir);
 
         Path dest = dir.resolve(newFilename);

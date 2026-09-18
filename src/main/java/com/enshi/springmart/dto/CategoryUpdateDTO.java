@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class CategoryUpdateDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "分类ID不能为空")
+    // 分类ID由路径参数 /update/{id} 传入，这里不需要校验，也不该要求前端再传一遍
     private Long id;
 
     @NotBlank(message = "分类名称不能为空")

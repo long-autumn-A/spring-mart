@@ -45,7 +45,6 @@ CREATE TABLE `category` (
     KEY `idx_parent_id` (`parent_id`),
     KEY `idx_sort_order` (`sort_order`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品分类表';
- ALTER TABLE `category` ADD COLUMN `description` VARCHAR(255) DEFAULT NULL COMMENT '分类描述' AFTER `icon`;
 
 -- ==================== 3. 店铺表 ====================
 DROP TABLE IF EXISTS `shop`;
@@ -101,9 +100,6 @@ CREATE TABLE `product` (
     CONSTRAINT `fk_product_shop` FOREIGN KEY (`shop_id`) REFERENCES `shop`(`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品表';
 
-  ALTER TABLE `product`
-     ADD COLUMN `badge`     VARCHAR(20) DEFAULT NULL COMMENT '角标（热卖/新品/爆款等）' AFTER `main_image`,
-     ADD COLUMN `sort_order` INT         NOT NULL DEFAULT 0   COMMENT '排序值（越小越靠前）' AFTER `is_recommended`;
 
 
 -- ==================== 4. 商品图片表 ====================
@@ -258,6 +254,24 @@ CREATE TABLE `banner` (
     PRIMARY KEY (`id`),
     KEY `idx_status_sort` (`status`, `sort_order`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='轮播图表';
+
+
+-- ==================== 13. 管理员操作日志表 ====================
+DROP TABLE IF EXISTS `admin_log`;
+CREATE TABLE `admin_log` (
+    `id`             BIGINT       NOT NULL AUTO_INCREMENT  COMMENT '日志ID',
+    `admin_id`       BIGINT       NOT NULL                 COMMENT '操作的管理员ID',
+    `admin_username` VARCHAR(50)  DEFAULT NULL             COMMENT '操作人用户名（冗余，看日志不用联表）',
+    `action`         VARCHAR(50)  NOT NULL                 COMMENT '动作，如：封禁用户、强制下架商品',
+    `target_type`    VARCHAR(20)  NOT NULL                 COMMENT '对象类型: USER/SHOP/PRODUCT/CATEGORY',
+    `target_id`      BIGINT       DEFAULT NULL             COMMENT '对象ID',
+    `detail`         VARCHAR(500) DEFAULT NULL             COMMENT '操作详情',
+    `created_at`     DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '操作时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_admin` (`admin_id`),
+    KEY `idx_target` (`target_type`, `target_id`),
+    KEY `idx_created` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='管理员操作日志表';
 
 
 -- =====================================================

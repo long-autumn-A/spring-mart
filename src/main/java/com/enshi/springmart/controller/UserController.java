@@ -5,11 +5,13 @@ import com.enshi.springmart.dto.ChangePasswordDTO;
 import com.enshi.springmart.dto.UserLoginDTO;
 import com.enshi.springmart.dto.UserRegisterDTO;
 import com.enshi.springmart.dto.UserUpdateDTO;
+import com.enshi.springmart.redis.TokenRedisService;
 import com.enshi.springmart.service.UserService;
 import com.enshi.springmart.utils.UserContext;
 import com.enshi.springmart.vo.LoginResultV0;
 import com.enshi.springmart.vo.UserV0;
 import jakarta.validation.Valid;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Resource
+    private TokenRedisService tokenRedisService;
 
     // 注册
     @PostMapping("/register")
@@ -45,7 +50,7 @@ public class UserController {
     // 修改个人资料
     @PutMapping("/update")
     public Result<UserV0> updateInfo(@Valid @RequestBody UserUpdateDTO updateDTO) {
-        UserV0 userVO = userService.updateUserInfo(updateDTO);
+        UserV0 userVO = userService.updateUserInfo(UserContext.getUserId(), updateDTO);
         return Result.success("资料更新成功", userVO);
     }
 
@@ -55,5 +60,12 @@ public class UserController {
         Long userId = UserContext.getUserId();
         userService.changePassword(userId, changePasswordDTO);
         return Result.success("密码修改成功，请使用新密码重新登录", null);
+    }
+
+    // 退出登录：把当前这条会话从 Redis 白名单里删掉，这个 token 立刻就失效了
+    @PostMapping("/logout")
+    public Result<?> logout() {
+        tokenRedisService.removeToken(UserContext.getJti(), UserContext.getUserId());
+        return Result.success("已退出登录", null);
     }
 }

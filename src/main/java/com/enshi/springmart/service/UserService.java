@@ -19,7 +19,7 @@ public interface UserService extends IService<User> {
     LoginResultV0 login(UserLoginDTO loginDTO);
 
     // 改资料（昵称、手机号、邮箱、头像）
-    UserV0 updateUserInfo(UserUpdateDTO updateDTO);
+    UserV0 updateUserInfo(Long userId, UserUpdateDTO updateDTO);
 
     // 查某个用户的信息
     UserV0 getUserById(Long userId);

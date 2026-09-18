@@ -13,6 +13,7 @@ public enum ResultCode {
     UNAUTHORIZED(401, "未登录或Token已过期"),
     FORBIDDEN(403, "无权限访问"),
     NOT_FOUND(404, "资源不存在"),
+    TOO_MANY_REQUESTS(429, "操作过于频繁，请稍后再试"),
     INTERNAL_ERROR(500, "服务器内部错误"),
 
     // 用户模块的业务错误码
@@ -22,6 +23,8 @@ public enum ResultCode {
     ACCOUNT_DISABLED(1004, "账号已被禁用"),
     PHONE_EXIST(1005, "手机号已注册"),
     USERNAME_EXIST(1006, "用户名已被占用"),
+    VERIFICATION_ERROR(1007,"验证码错误"),
+    ACCOUNT_LOCKED(1008, "密码连续输错次数过多，账号已被暂时锁定"),
 
     // 商品模块
     PRODUCT_NOT_FOUND(2001, "商品不存在"),
@@ -32,10 +35,17 @@ public enum ResultCode {
     CATEGORY_HAS_CHILDREN(3002, "该分类下还有子分类，无法删除"),
     CATEGORY_PARENT_NOT_FOUND(3003, "父分类不存在"),
     CATEGORY_PARENT_SELF(3004, "不能将自己设为父分类"),
+    CATEGORY_HAS_PRODUCTS(3005, "该分类下还有商品，无法删除"),
 
     // 订单模块
-    ORDER_NOT_FOUND(3001, "订单不存在"), // 注意：你原代码中分类和订单都用了3001、3002，建议后续将订单改为3500+或别的，暂时保持原样
-    ORDER_CANNOT_CANCEL(3002, "订单无法取消"),
+    ORDER_NOT_FOUND(7001, "订单不存在"),
+    ORDER_STATUS_ERROR(7002, "当前订单状态不允许此操作"),
+    ORDER_NOT_BELONG(7003, "订单不属于当前用户"),
+    ORDER_STOCK_INSUFFICIENT(7004, "库存不足，无法下单"),
+    ORDER_ADDRESS_NOT_FOUND(7005, "收货地址不存在"),
+    ORDER_ITEM_EMPTY(7006, "订单商品不能为空"),
+    ORDER_CANNOT_CANCEL(7007, "只有待付款状态的订单才能取消"),
+    ORDER_EXPIRED(7008, "订单已超时，无法支付"),
 
     // 店铺模块
     SHOP_NOT_FOUND(4001, "店铺不存在"),
@@ -50,7 +60,12 @@ public enum ResultCode {
     CART_QUANTITY_INVALID(5005, "商品数量必须大于0"),
     CART_EMPTY_CHECKOUT(5006, "未选中任何商品，无法结算"),
     CART_ITEM_LIMIT_EXCEEDED(5007, "购物车商品种类已达上限，请先清理"),
-    CART_UPDATE_STOCK_INSUFFICIENT(5008, "修改数量失败，商品库存不足");
+    CART_UPDATE_STOCK_INSUFFICIENT(5008, "修改数量失败，商品库存不足"),
+
+    // 地址模块
+    ADDRESS_NOT_FOUND(6001, "地址不存在"),
+    ADDRESS_NOT_BELONG(6002, "地址不属于当前用户"),
+    ADDRESS_LIMIT_EXCEEDED(6003, "地址数量已达上限（最多20个）");
 
     private final int code;
     private final String message;

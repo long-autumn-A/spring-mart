@@ -5,9 +5,13 @@ import com.enshi.springmart.common.result.PageResult;
 import com.enshi.springmart.common.result.Result;
 import com.enshi.springmart.common.result.ResultCode;
 import com.enshi.springmart.dto.ProductSaveDTO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.enshi.springmart.entity.Product;
 import com.enshi.springmart.entity.ProductImage;
+import com.enshi.springmart.entity.Shop;
 import com.enshi.springmart.service.ProductImageService;
 import com.enshi.springmart.service.ProductService;
+import com.enshi.springmart.service.ShopService;
 import com.enshi.springmart.utils.UserContext;
 import com.enshi.springmart.vo.ProductVO;
 import jakarta.validation.Valid;
@@ -27,6 +31,9 @@ public class ProductController {
 
     @Autowired
     private ProductImageService productImageService;
+
+    @Autowired
+    private ShopService shopService;
 
     // ==================== 公开接口 ====================
 
@@ -61,6 +68,7 @@ public class ProductController {
     public Result<?> addProduct(@Valid @RequestBody ProductSaveDTO dto) {
         log.info("收到新增商品请求: name={}, shopId={}, categoryId={}", dto.getName(), dto.getShopId(), dto.getCategoryId());
         checkAdminOrMerchant();
+        bindMerchantShop(dto);
         productService.saveProduct(dto);
         return Result.success("商品新增成功", null);
     }
@@ -71,6 +79,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public Result<?> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductSaveDTO dto) {
         checkAdminOrMerchant();
+        checkMerchantOwnership(id);
         dto.setId(id);
         productService.updateProduct(dto);
         return Result.success("商品修改成功", null);
@@ -82,6 +91,7 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public Result<?> deleteProduct(@PathVariable Long id) {
         checkAdminOrMerchant();
+        checkMerchantOwnership(id);
         productService.deleteProduct(id);
         return Result.success("商品删除成功", null);
     }
@@ -92,6 +102,7 @@ public class ProductController {
     @PutMapping("/{id}/status")
     public Result<?> updateStatus(@PathVariable Long id, @RequestParam Integer status) {
         checkAdminOrMerchant();
+        checkMerchantOwnership(id);
         productService.updateStatus(id, status);
         return Result.success("商品状态变更成功", null);
     }
@@ -138,6 +149,40 @@ public class ProductController {
         Integer role = UserContext.getRole();
         if (role == null || (role != 1 && role != 2)) {
             throw new BusinessException(ResultCode.FORBIDDEN);
+        }
+    }
+
+    /**
+     * 商家只能操作自己店铺的商品，管理员不受限
+     */
+    private void checkMerchantOwnership(Long productId) {
+        Integer role = UserContext.getRole();
+        if (role == null || role != 1) {
+            return;
+        }
+        Product product = productService.getById(productId);
+        if (product == null) {
+            throw new BusinessException(ResultCode.PRODUCT_NOT_FOUND);
+        }
+        Shop myShop = shopService.getOne(new LambdaQueryWrapper<Shop>()
+                .eq(Shop::getUserId, UserContext.getUserId()));
+        if (myShop == null || !myShop.getId().equals(product.getShopId())) {
+            throw new BusinessException(ResultCode.FORBIDDEN);
+        }
+    }
+
+    /**
+     * 商家新增商品时，店铺强制绑定为自己的店
+     */
+    private void bindMerchantShop(ProductSaveDTO dto) {
+        Integer role = UserContext.getRole();
+        if (role != null && role == 1) {
+            Shop myShop = shopService.getOne(new LambdaQueryWrapper<Shop>()
+                    .eq(Shop::getUserId, UserContext.getUserId()));
+            if (myShop == null) {
+                throw new BusinessException(ResultCode.SHOP_NOT_FOUND);
+            }
+            dto.setShopId(myShop.getId());
         }
     }
 

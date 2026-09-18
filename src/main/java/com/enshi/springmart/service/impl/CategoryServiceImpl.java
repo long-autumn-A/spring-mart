@@ -6,9 +6,12 @@ import com.enshi.springmart.common.result.ResultCode;
 import com.enshi.springmart.dto.CategorySaveDTO;
 import com.enshi.springmart.dto.CategoryUpdateDTO;
 import com.enshi.springmart.entity.Category;
+import com.enshi.springmart.entity.Product;
 import com.enshi.springmart.mapper.CategoryMapper;
 import com.enshi.springmart.service.CategoryService;
+import com.enshi.springmart.service.ProductService;
 import com.enshi.springmart.vo.CategoryTreeVO;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements CategoryService {
+
+    @Resource
+    private ProductService productService;
 
     @Override
     public boolean saveCategory(CategorySaveDTO saveDTO) {
@@ -51,7 +57,13 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
         if (childCount > 0) {
             throw new BusinessException(ResultCode.CATEGORY_HAS_CHILDREN);
         }
-        // TODO: 后续关联 goods 表后，校验该分类下是否有商品，有则不允许删除
+        // 分类下还挂着商品的话不让删，否则那些商品会指向一个不存在的分类
+        Long productCount = productService.lambdaQuery()
+                .eq(Product::getCategoryId, id)
+                .count();
+        if (productCount > 0) {
+            throw new BusinessException(ResultCode.CATEGORY_HAS_PRODUCTS);
+        }
         int rows = baseMapper.deleteById(id);
         log.info("分类删除成功: id={}, name={}", id, category.getName());
         return rows > 0;
